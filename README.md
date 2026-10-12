@@ -1,88 +1,71 @@
 # SQL Server Data Warehouse Project
 
-A SQL Server/T-SQL project demonstrating a layered data-warehouse workflow, transformation scripts, analytical views, and data-quality checks.
+A SQL Server/T-SQL learning project for building a layered warehouse from CRM and ERP source data, transforming it for analytics, and defining Gold-layer views.
 
-## Project Overview
+## Architecture
 
-The repository is organized around the **Bronze → Silver → Gold** warehouse pattern:
-
-- **Bronze:** landing/staging structures and initial data loading.
-- **Silver:** cleaned and standardized data structures and transformations.
-- **Gold:** business-facing views for customer, product, and sales analysis.
-
-> Scope note: This README describes the repository structure and SQL assets. Run the scripts in SQL Server and validate the resulting objects/data before treating the workflow as production-ready.
+```text
+CRM / ERP CSV files
+       |
+       v
+Bronze — source-aligned landing tables
+       |
+       v
+Silver — cleaned and standardized tables
+       |
+       v
+Gold — customer and product dimensions,
+       plus a sales fact view
+       |
+       v
+Analytics and reporting queries
+```
 
 ## Repository Structure
 
-```text
-.
-├── Docs/                         # Project documentation
-├── datasets/                     # Input datasets (if included)
-├── scripts/
-│   ├── bronze/                   # Bronze-layer DDL and load procedure
-│   ├── Silver/                   # Silver-layer DDL and load procedure
-│   └── Gold/                     # Gold-layer analytical views
-├── tests/                        # SQL data-quality checks
-├── LICENSE
-└── README.md
-```
+- `Docs/` — project documentation
+- `datasets/` — source data location (verify that required CSV files are included)
+- `scripts/bronze/` — Bronze DDL and load procedure
+- `scripts/Silver/` — Silver DDL and transformation/load procedure
+- `scripts/Gold/` — Gold analytical views
+- `tests/quality_checks_Silver.sql` — diagnostic data-quality queries
 
-## Technology Stack
+## Technology
 
 - Microsoft SQL Server
-- T-SQL
-- SQL DDL and stored procedures
-- Layered data warehousing
-- SQL-based data validation
+- T-SQL, DDL, stored procedures, `BULK INSERT`
+- ETL transformations and dimensional modeling
+- Data-quality checks
 
-## Main SQL Assets
+## Main Components
 
-- Bronze layer: `ddl.bronze.sql`, `proc_load_bronze.sql`
-- Silver layer: `ddl_Silver.sql`, `proc_load_silver.sql`
-- Gold layer: `DDL_Gold.sql`
-- Quality checks: `quality_checks_Silver.sql`
+- **Bronze:** defines source-aligned CRM/ERP tables and loads CSV files.
+- **Silver:** standardizes customer attributes, transforms source fields, and prepares data for analysis.
+- **Gold:** defines customer and product dimensions and a sales fact view.
+- **Quality checks:** returns rows that violate selected key, null, duplicate, or value checks.
 
-File names preserve the repository's current casing.
+## Setup and Execution
 
-## Data Flow
+1. Use a SQL Server instance and a client such as SQL Server Management Studio.
+2. Create the `Bronze`, `Silver`, and `Gold` schemas if they do not already exist.
+3. Inspect the CSV file locations expected by `scripts/bronze/proc_load_bronze.sql` and change them to paths available on your machine.
+4. Run the Bronze DDL script, then create and execute `Bronze.load_bronze`.
+5. Run the Silver DDL script, then create and execute `Silver.load_silver`.
+6. Run `scripts/Gold/DDL_Gold.sql` to create the analytical views.
+7. Run `tests/quality_checks_Silver.sql` and inspect any returned rows.
+8. Verify the views with sample SELECT queries before using them for reporting.
 
-```text
-Source datasets
-      |
-      v
-  Bronze layer
-(raw / landing data)
-      |
-      v
-  Silver layer
-(cleaning / standardization)
-      |
-      v
-   Gold layer
-(customer, product,
- and sales views)
-      |
-      v
-Analytical queries / reporting
-```
+**Important:** the Bronze loader originally contained a machine-specific Windows path. Update all CSV paths before running it. This project has not been independently executed against your SQL Server instance from this review, so validate script execution and output locally.
 
-## How to Explore
+## Known Follow-up Work
 
-1. Read the materials in `Docs/`.
-2. Inspect the available files in `datasets/`.
-3. Review the Bronze, Silver, and Gold SQL scripts in sequence.
-4. Review `tests/quality_checks_Silver.sql` and execute checks against the intended database.
-5. Validate object names, row counts, and query results in SQL Server Management Studio or another SQL Server client.
-
-## Current Limitations / Next Improvements
-
-- Add a documented SQL Server version and database setup instructions.
-- Document the exact source files, expected schemas, and execution order.
-- Include representative query outputs or screenshots after running the scripts.
-- Record data-quality check outcomes and sample row counts.
-- Add automated test execution where practical.
+- Confirm the required CSV files are committed and document their source/licensing.
+- Add schema creation/setup scripts and example analytical queries.
+- Add expected row counts and documented validation results.
+- Consider making the load procedures configurable rather than relying on local absolute paths.
+- Run all scripts from a clean database and document any environment-specific prerequisites.
 
 ## Author
 
 **Shiva Sai Goud Mallarapu**  
-GitHub: [Shivasai-mallarapu](https://github.com/Shivasai-mallarapu)
+[GitHub profile](https://github.com/Shivasai-mallarapu)
